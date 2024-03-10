@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 
 // Mock data for demonstration
 const mockData = [
@@ -9,6 +9,12 @@ const mockData = [
   { env: 'qa', clientId: 4, app_name: 'app4', secret: 'secret2' },
   { env: 'qa', clientId: 5, app_name: 'app1', secret: 'secret1' },
   { env: 'qa', clientId: 6, app_name: 'app2', secret: 'secret2' },
+  { env: 'dev', clientId: 7, app_name: 'app1', secret: 'secret1' },
+  { env: 'dev', clientId: 8, app_name: 'app2', secret: 'secret2' },
+  { env: 'dev', clientId: 9, app_name: 'app3', secret: 'secret1' },
+  { env: 'qa', clientId: 10, app_name: 'app4', secret: 'secret2' },
+  { env: 'qa', clientId: 11, app_name: 'app1', secret: 'secret1' },
+  { env: 'qa', clientId: 12, app_name: 'app2', secret: 'secret2' },
   // Add more mock data as needed
 ];
 
@@ -16,6 +22,8 @@ const TableScreen = () => {
   const [data, setData] = useState(mockData);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     // Filter data based on search term
@@ -26,7 +34,31 @@ const TableScreen = () => {
       item.secret.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page when search term changes
   }, [searchTerm, data]);
+
+  const renderPagination = () => {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <TouchableOpacity
+          key={i}
+          style={styles.pageNumber}
+          onPress={() => setCurrentPage(i)}
+        >
+          <Text>{i}</Text>
+        </TouchableOpacity>
+      );
+    }
+    return pageNumbers;
+  };
+
+  const renderTableData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredData.slice(startIndex, endIndex);
+  };
 
   const renderItem = ({ item, index }) => (
     <View style={[styles.row, index % 2 === 0 ? styles.evenRow : styles.oddRow]}>
@@ -39,7 +71,7 @@ const TableScreen = () => {
 
   return (
     <View style={styles.container}>
-       <View style={styles.searchBar}>
+      <View style={styles.searchBar}>
         <TextInput
           style={styles.input}
           placeholder="Search by Env, App Name, clientId, or Secret"
@@ -55,10 +87,11 @@ const TableScreen = () => {
         <Text style={styles.headerText}>Secret</Text>
       </View>
       <FlatList
-        data={filteredData}
+        data={renderTableData()}
         renderItem={renderItem}
         keyExtractor={item => item.clientId.toString()}
       />
+      <View style={styles.pagination}>{renderPagination()}</View>
     </View>
   );
 };
@@ -87,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
     padding: 10,
-    borderWclientIdth: 1,
+    borderWidth: 1,
     borderColor: '#ccc',
     backgroundColor: '#fff',
   },
@@ -104,6 +137,17 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     textAlign: 'center',
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  pageNumber: {
+    marginHorizontal: 5,
+    padding: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });
 
