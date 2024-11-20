@@ -25,9 +25,9 @@ To start the application, run:
 ```bash
 npx expo start
 ```
-## Screenshot
+## Application Preview
 
-Here is a screenshot of the running application:
+Here is how the application will look:
 
 ![Running Application](./assets/cred-manager.png)
 ## Contributing
